@@ -27,7 +27,7 @@ const MOCK = {
     { name: "Equalized Odds",      score: 0.28, color: "#f5a623", desc: "False positive rates vary across demographics" },
     { name: "Disparate Impact",    score: 0.61, color: "#ff5f7e", desc: "Below 0.8 threshold — violates 80% rule" },
     { name: "Calibration Error",   score: 0.12, color: "#60a5fa", desc: "Predictions are moderately well-calibrated" },
-    { name: "Individual Fairness", score: 0.08, color: "#00e5c3", desc: "Similar individuals treated similarly ✓" },
+    { name: "Individual Fairness", score: 0.08, color: "#2563eb", desc: "Similar individuals treated similarly ✓" },
   ],
   divergence: {
     index: 0.54, statistical: 0.18, community: 0.72,
@@ -125,9 +125,9 @@ export default function Dashboard({ auditId, initialData }) {
 
         {/* Logo */}
         <div style={{ padding: "18px 18px 14px", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", gap: 9 }}>
-          <div style={{ width: 28, height: 28, borderRadius: 7, background: "linear-gradient(135deg,#00e5c3,#00a3ff)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>⚖</div>
+          <div style={{ width: 28, height: 28, borderRadius: 7, background: "linear-gradient(135deg,#2563eb,#00a3ff)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>⚖</div>
           <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: "0.95rem" }}>
-            Equality<span style={{ color: "#00e5c3" }}>Lens</span>
+            Equality<span style={{ color: "#2563eb" }}>Lens</span>
           </span>
         </div>
 
@@ -136,8 +136,8 @@ export default function Dashboard({ auditId, initialData }) {
           <div style={{ fontFamily: "'DM Mono',monospace", fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "0.08em", color: "#6b7280", marginBottom: 5 }}>Current Audit</div>
           <div style={{ fontSize: "0.78rem", fontWeight: 500, marginBottom: 3, color: "#e8eaf0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{data.file}</div>
           <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-            <span style={{ width: 6, height: 6, borderRadius: "50%", background: overallSeverity === "critical" ? "#ff5f7e" : overallSeverity === "high" ? "#f5a623" : "#00e5c3", display: "inline-block" }} />
-            <span style={{ fontFamily: "'DM Mono',monospace", fontSize: "0.65rem", color: overallSeverity === "critical" ? "#ff5f7e" : overallSeverity === "high" ? "#f5a623" : "#00e5c3", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+            <span style={{ width: 6, height: 6, borderRadius: "50%", background: overallSeverity === "critical" ? "#ff5f7e" : overallSeverity === "high" ? "#f5a623" : "#2563eb", display: "inline-block" }} />
+            <span style={{ fontFamily: "'DM Mono',monospace", fontSize: "0.65rem", color: overallSeverity === "critical" ? "#ff5f7e" : overallSeverity === "high" ? "#f5a623" : "#2563eb", textTransform: "uppercase", letterSpacing: "0.06em" }}>
               {overallSeverity} bias
             </span>
           </div>
@@ -150,7 +150,7 @@ export default function Dashboard({ auditId, initialData }) {
               <div style={{ fontFamily: "'DM Mono',monospace", fontSize: "0.6rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "#6b7280", padding: "0 8px", marginBottom: 2 }}>{sec.label}</div>
               {sec.items.map(item => (
                 <button key={item.id} onClick={() => scrollTo(item.id)}
-                  style={{ display: "flex", alignItems: "center", gap: 9, width: "100%", padding: "7px 10px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: "0.83rem", fontFamily: "'DM Sans',sans-serif", textAlign: "left", transition: "all 0.15s", background: activeSection === item.id ? "rgba(0,229,195,0.08)" : "transparent", color: activeSection === item.id ? "#00e5c3" : "#9ca3af" }}>
+                  style={{ display: "flex", alignItems: "center", gap: 9, width: "100%", padding: "7px 10px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: "0.83rem", fontFamily: "'DM Sans',sans-serif", textAlign: "left", transition: "all 0.15s", background: activeSection === item.id ? "rgba(37,99,235,0.08)" : "transparent", color: activeSection === item.id ? "#2563eb" : "#9ca3af" }}>
                   <span style={{ fontSize: 14, width: 16, textAlign: "center" }}>{item.icon}</span>
                   {item.label}
                 </button>
@@ -176,7 +176,7 @@ export default function Dashboard({ auditId, initialData }) {
       <div style={{ marginLeft: 232, flex: 1, display: "flex", flexDirection: "column" }}>
 
         {/* Topbar */}
-        <div style={{ height: 54, background: "rgba(10,11,15,0.85)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 24px", position: "sticky", top: 0, zIndex: 40 }}>
+        <div style={{ height: 54, background: "rgba(10,11,15,0.9)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 24px", position: "sticky", top: 0, zIndex: 40 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <span style={{ fontSize: "0.78rem", color: "#6b7280" }}>Dashboard</span>
             <span style={{ color: "rgba(255,255,255,0.15)" }}>/</span>
@@ -188,7 +188,7 @@ export default function Dashboard({ auditId, initialData }) {
           <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
             <span style={{ fontFamily: "'DM Mono',monospace", fontSize: "0.65rem", color: "#6b7280" }}>{data.auditId || "EQL-2026-0422-A7F3"}</span>
             <button onClick={() => handleExport("euai")} disabled={exporting}
-              style={{ padding: "6px 14px", borderRadius: 7, fontSize: "0.78rem", fontFamily: "'DM Sans',sans-serif", cursor: "pointer", background: exporting ? "rgba(0,229,195,0.3)" : "#00e5c3", border: "none", color: "#0a0b0f", fontWeight: 600, transition: "all 0.2s" }}>
+              style={{ padding: "6px 14px", borderRadius: 7, fontSize: "0.78rem", fontFamily: "'DM Sans',sans-serif", cursor: "pointer", background: exporting ? "rgba(0,229,195,0.3)" : "#2563eb", border: "none", color: "#0a0b0f", fontWeight: 600, transition: "all 0.2s" }}>
               {exporting ? "Generating..." : "Export PDF ↓"}
             </button>
           </div>
@@ -213,7 +213,7 @@ export default function Dashboard({ auditId, initialData }) {
             <ScoreCard label="Overall Bias Score"  value={data.overallBias}      color="#ff5f7e" topColor="#ff5f7e" sub="⚠ Critical — Action required" />
             <ScoreCard label="Divergence Index"    value={data.divergenceIndex}   color="#f5a623" topColor="#f5a623" sub="Math underestimates harm" />
             <ScoreCard label="Proxy Variables"     value={data.proxyCount}        color="#f5a623" topColor="#f5a623" sub="2 critical, 2 high risk" integer />
-            <ScoreCard label="Community Reports"   value={data.communityReports}  color="#00e5c3" topColor="#00e5c3" sub="Confirming findings" integer />
+            <ScoreCard label="Community Reports"   value={data.communityReports}  color="#2563eb" topColor="#2563eb" sub="Confirming findings" integer />
           </div>
 
           {/* ── PROXY + METRICS side by side ── */}
@@ -247,7 +247,7 @@ export default function Dashboard({ auditId, initialData }) {
                       <span style={{ fontSize: "0.82rem", fontWeight: 500 }}>{m.name}</span>
                       <span style={{ fontFamily: "'DM Mono',monospace", fontSize: "0.78rem", color: m.color }}>{m.score.toFixed(2)}</span>
                     </div>
-                    <div style={{ height: 4, background: "#1e2130", borderRadius: 100, overflow: "hidden", marginBottom: 4 }}>
+                    <div style={{ height: 4, background: "#181b27", borderRadius: 100, overflow: "hidden", marginBottom: 4 }}>
                       <div style={{ width: `${m.score * 100}%`, height: "100%", background: m.color, borderRadius: 100, transition: "width 1s ease" }} />
                     </div>
                     <div style={{ fontSize: "0.7rem", color: "#6b7280" }}>{m.desc}</div>
@@ -310,7 +310,7 @@ const Panel = ({ id, title, tag, tagColor, children, style }) => (
 function LoadingScreen() {
   return (
     <div style={{ minHeight: "100vh", background: "#0a0b0f", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 16 }}>
-      <div style={{ width: 40, height: 40, border: "3px solid rgba(255,255,255,0.08)", borderTopColor: "#00e5c3", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+      <div style={{ width: 40, height: 40, border: "3px solid rgba(255,255,255,0.08)", borderTopColor: "#2563eb", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
       <div style={{ fontFamily: "'DM Mono',monospace", fontSize: "0.78rem", color: "#6b7280" }}>Loading audit results...</div>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>

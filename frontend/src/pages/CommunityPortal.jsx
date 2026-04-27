@@ -42,7 +42,7 @@ export default function CommunityPortal() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#0a0b0f", color: "#e8eaf0", fontFamily: "'DM Sans', sans-serif", display: "flex", flexDirection: "column" }}>
+    <div style={{ minHeight: "100vh", background: /* "#0a0b0f"*/"#0f0e17", color: "#e8eaf0", fontFamily: "'DM Sans', sans-serif", display: "flex", flexDirection: "column" }}>
 
       {/* NAV */}
       <nav style={{ padding: "16px 32px", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(10,11,15,0.8)", backdropFilter: "blur(12px)", position: "sticky", top: 0, zIndex: 50 }}>

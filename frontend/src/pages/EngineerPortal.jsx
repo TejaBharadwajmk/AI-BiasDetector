@@ -9,7 +9,7 @@ const SAMPLES = [
   { key: "adult",   label: "UCI Adult Income",  rows: "48,842 rows", attrs: "gender, race, age",    color: "#ff5f7e" },
   { key: "hiring",  label: "Hiring Decisions",   rows: "12,431 rows", attrs: "gender, race",         color: "#f5a623" },
   { key: "credit",  label: "Credit Approval",    rows: "30,000 rows", attrs: "gender, age, income",  color: "#60a5fa" },
-  { key: "medical", label: "Medical Triage",     rows: "8,219 rows",  attrs: "race, gender, age",    color: "#00e5c3" },
+  { key: "medical", label: "Medical Triage",     rows: "8,219 rows",  attrs: "race, gender, age",    color: "#2563eb" },
 ];
 
 const LOADING_STEPS = [
@@ -126,7 +126,7 @@ export default function EngineerPortal() {
         { name: "Equalized Odds",      score: 0.28, color: "#f5a623", desc: "False positive rates vary across demographics" },
         { name: "Disparate Impact",    score: 0.61, color: "#ff5f7e", desc: "Below 0.8 threshold — violates 80% rule" },
         { name: "Calibration Error",   score: 0.12, color: "#60a5fa", desc: "Predictions are moderately well-calibrated" },
-        { name: "Individual Fairness", score: 0.08, color: "#00e5c3", desc: "Similar individuals treated similarly ✓" },
+        { name: "Individual Fairness", score: 0.08, color: "#2563eb", desc: "Similar individuals treated similarly ✓" },
       ],
       divergence: {
         index: 0.54,
@@ -157,8 +157,8 @@ export default function EngineerPortal() {
       {/* SIDEBAR */}
       <aside style={{ width: 240, background: "#10121a", borderRight: "1px solid rgba(255,255,255,0.07)", display: "flex", flexDirection: "column", position: "fixed", top: 0, left: 0, bottom: 0, zIndex: 50 }}>
         <div style={{ padding: "20px 20px 16px", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 30, height: 30, borderRadius: 8, background: "linear-gradient(135deg, #00e5c3, #00a3ff)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>⚖</div>
-          <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1rem" }}>Equality<span style={{ color: "#00e5c3" }}>Lens</span></span>
+          <div style={{ width: 30, height: 30, borderRadius: 8, background: "linear-gradient(135deg, #2563eb, #00a3ff)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>⚖</div>
+          <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1rem" }}>Equality<span style={{ color: "#2563eb" }}>Lens</span></span>
         </div>
 
         <SidebarSection label="Audit">
@@ -175,7 +175,7 @@ export default function EngineerPortal() {
           <div style={{ padding: "10px 12px", background: "#181b27", borderRadius: 10, border: "1px solid rgba(255,255,255,0.07)" }}>
             <div style={{ fontFamily: "'DM Mono', monospace", fontSize: "0.62rem", color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>Audit Status</div>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <div style={{ width: 7, height: 7, borderRadius: "50%", background: auditData ? "#00e5c3" : "#6b7280" }} />
+              <div style={{ width: 7, height: 7, borderRadius: "50%", background: auditData ? "#2563eb" : "#6b7280" }} />
               <span style={{ fontSize: "0.8rem", color: "#9ca3af" }}>{auditData ? "Audit complete" : "No audit running"}</span>
             </div>
           </div>
@@ -217,12 +217,12 @@ export default function EngineerPortal() {
                     onDrop={handleDrop}
                     onClick={() => fileRef.current.click()}
                     style={{ border: "2px dashed rgba(255,255,255,0.12)", borderRadius: 10, padding: "32px 20px", textAlign: "center", cursor: "pointer", background: "#0a0b0f", transition: "all 0.2s" }}
-                    onMouseEnter={e => e.currentTarget.style.borderColor = "#00e5c3"}
+                    onMouseEnter={e => e.currentTarget.style.borderColor = "#2563eb"}
                     onMouseLeave={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"}
                   >
                     <div style={{ fontSize: "2rem", marginBottom: 10 }}>🗃</div>
-                    <div style={{ fontSize: "0.85rem", color: "#9ca3af" }}><strong style={{ color: "#00e5c3" }}>Click to upload</strong> or drag & drop</div>
-                    <div style={{ fontSize: "0.78rem", color: fileName ? "#00e5c3" : "#6b7280", marginTop: 4 }}>{fileName || "No file selected"}</div>
+                    <div style={{ fontSize: "0.85rem", color: "#9ca3af" }}><strong style={{ color: "#2563eb" }}>Click to upload</strong> or drag & drop</div>
+                    <div style={{ fontSize: "0.78rem", color: fileName ? "#2563eb" : "#6b7280", marginTop: 4 }}>{fileName || "No file selected"}</div>
                     <div style={{ fontFamily: "'DM Mono', monospace", fontSize: "0.68rem", color: "#6b7280", marginTop: 6 }}>CSV · JSON · SQL schema</div>
                   </div>
                   <input ref={fileRef} type="file" accept=".csv,.json" style={{ display: "none" }} onChange={handleFileChange} />
@@ -233,7 +233,7 @@ export default function EngineerPortal() {
                     <label style={inputLabel}>Protected Attributes</label>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 8 }}>
                       {ATTRS.map(a => (
-                        <label key={a} style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 12px", border: `1px solid ${protectedAttrs.includes(a) ? "#00e5c3" : "rgba(255,255,255,0.07)"}`, borderRadius: 100, cursor: "pointer", fontSize: "0.78rem", background: protectedAttrs.includes(a) ? "rgba(0,229,195,0.08)" : "transparent", color: protectedAttrs.includes(a) ? "#00e5c3" : "#9ca3af", transition: "all 0.15s" }}>
+                        <label key={a} style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 12px", border: `1px solid ${protectedAttrs.includes(a) ? "#2563eb" : "rgba(255,255,255,0.07)"}`, borderRadius: 100, cursor: "pointer", fontSize: "0.78rem", background: protectedAttrs.includes(a) ? "rgba(0,229,195,0.08)" : "transparent", color: protectedAttrs.includes(a) ? "#2563eb" : "#9ca3af", transition: "all 0.15s" }}>
                           <input type="checkbox" checked={protectedAttrs.includes(a)} onChange={() => toggleAttr(a)} style={{ display: "none" }} />
                           {a}
                         </label>
@@ -294,7 +294,7 @@ export default function EngineerPortal() {
                   <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                     {SAMPLES.map(s => (
                       <div key={s.key} onClick={() => loadSample(s)}
-                        style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 14px", background: selectedSample?.key === s.key ? "rgba(0,229,195,0.06)" : "#10121a", border: `1px solid ${selectedSample?.key === s.key ? "#00e5c3" : "rgba(255,255,255,0.07)"}`, borderRadius: 8, fontSize: "0.8rem", cursor: "pointer", transition: "all 0.15s", color: selectedSample?.key === s.key ? "#00e5c3" : "#e8eaf0" }}>
+                        style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 14px", background: selectedSample?.key === s.key ? "rgba(0,229,195,0.06)" : "#10121a", border: `1px solid ${selectedSample?.key === s.key ? "#2563eb" : "rgba(255,255,255,0.07)"}`, borderRadius: 8, fontSize: "0.8rem", cursor: "pointer", transition: "all 0.15s", color: selectedSample?.key === s.key ? "#2563eb" : "#e8eaf0" }}>
                         <span style={{ width: 6, height: 6, borderRadius: "50%", background: s.color, display: "inline-block" }} />
                         {s.label}
                         <span style={{ color: "#6b7280", fontSize: "0.72rem" }}>{s.rows}</span>
@@ -316,10 +316,10 @@ export default function EngineerPortal() {
       {/* LOADING OVERLAY */}
       {loading && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(10,11,15,0.88)", backdropFilter: "blur(10px)", zIndex: 200, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 24 }}>
-          <div style={{ width: 48, height: 48, border: "3px solid rgba(255,255,255,0.1)", borderTopColor: "#00e5c3", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+          <div style={{ width: 48, height: 48, border: "3px solid rgba(255,255,255,0.1)", borderTopColor: "#2563eb", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
           <div style={{ display: "flex", flexDirection: "column", gap: 10, alignItems: "center" }}>
             {LOADING_STEPS.map((step, i) => (
-              <div key={i} style={{ fontFamily: "'DM Mono', monospace", fontSize: "0.78rem", display: "flex", alignItems: "center", gap: 8, color: doneSteps.includes(i) ? "#00e5c3" : loadingStep === i ? "#e8eaf0" : "#6b7280", opacity: loadingStep >= i || doneSteps.includes(i) ? 1 : 0.3, transition: "all 0.4s" }}>
+              <div key={i} style={{ fontFamily: "'DM Mono', monospace", fontSize: "0.78rem", display: "flex", alignItems: "center", gap: 8, color: doneSteps.includes(i) ? "#2563eb" : loadingStep === i ? "#e8eaf0" : "#6b7280", opacity: loadingStep >= i || doneSteps.includes(i) ? 1 : 0.3, transition: "all 0.4s" }}>
                 <span style={{ width: 6, height: 6, borderRadius: "50%", background: "currentColor", display: "inline-block" }} />
                 {doneSteps.includes(i) ? "✓ " : ""}{step}
               </div>
@@ -349,7 +349,7 @@ function Dashboard({ data }) {
         <ScoreCard label="Overall Bias Score" value={data.overallBias} color="#ff5f7e" sub="⚠ Critical — Action required" />
         <ScoreCard label="Divergence Index"   value={data.divergenceIndex} color="#f5a623" sub="Math underestimates harm" />
         <ScoreCard label="Proxy Variables"    value={data.proxyCount} color="#f5a623" sub="2 critical, 2 high risk" />
-        <ScoreCard label="Community Reports"  value={data.communityReports} color="#00e5c3" sub="Confirming findings" />
+        <ScoreCard label="Community Reports"  value={data.communityReports} color="#2563eb" sub="Confirming findings" />
       </div>
 
       {/* GRID */}
@@ -446,10 +446,10 @@ function SidebarSection({ label, children }) {
 
 function SidebarItem({ icon, label, active, onClick, muted, badge }) {
   return (
-    <button onClick={onClick} disabled={muted} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "8px 10px", borderRadius: 8, color: active ? "#00e5c3" : muted ? "#4b5563" : "#9ca3af", background: active ? "rgba(0,229,195,0.08)" : "transparent", border: "none", cursor: muted ? "not-allowed" : "pointer", fontSize: "0.85rem", fontFamily: "'DM Sans', sans-serif", textAlign: "left", transition: "all 0.15s" }}>
+    <button onClick={onClick} disabled={muted} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "8px 10px", borderRadius: 8, color: active ? "#2563eb" : muted ? "#4b5563" : "#9ca3af", background: active ? "rgba(0,229,195,0.08)" : "transparent", border: "none", cursor: muted ? "not-allowed" : "pointer", fontSize: "0.85rem", fontFamily: "'DM Sans', sans-serif", textAlign: "left", transition: "all 0.15s" }}>
       <span style={{ fontSize: 15, width: 18, textAlign: "center" }}>{icon}</span>
       {label}
-      {badge && <span style={{ marginLeft: "auto", padding: "1px 7px", borderRadius: 100, fontFamily: "'DM Mono', monospace", fontSize: "0.6rem", background: "rgba(0,229,195,0.1)", color: "#00e5c3" }}>{badge}</span>}
+      {badge && <span style={{ marginLeft: "auto", padding: "1px 7px", borderRadius: 100, fontFamily: "'DM Mono', monospace", fontSize: "0.6rem", background: "rgba(0,229,195,0.1)", color: "#2563eb" }}>{badge}</span>}
     </button>
   );
 }
@@ -470,6 +470,6 @@ const cardTitle = { fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize:
 const cardSub = { color: "#6b7280", fontSize: "0.8rem", marginBottom: 20 };
 const inputLabel = { display: "block", fontSize: "0.78rem", color: "#9ca3af", marginBottom: 6, fontWeight: 500 };
 const inputField = { width: "100%", padding: "9px 12px", background: "#0a0b0f", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, color: "#e8eaf0", fontSize: "0.85rem", outline: "none", fontFamily: "'DM Sans', sans-serif" };
-const runBtn = { width: "100%", padding: 12, background: "#00e5c3", color: "#0a0b0f", border: "none", borderRadius: 10, fontSize: "0.9rem", fontWeight: 700, fontFamily: "'DM Sans', sans-serif", cursor: "pointer", marginTop: 20, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 };
+const runBtn = { width: "100%", padding: 12, background: "#2563eb", color: "#0a0b0f", border: "none", borderRadius: 10, fontSize: "0.9rem", fontWeight: 700, fontFamily: "'DM Sans', sans-serif", cursor: "pointer", marginTop: 20, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 };
 const ghostBtn = { padding: "6px 14px", borderRadius: 7, fontSize: "0.8rem", fontFamily: "'DM Sans', sans-serif", cursor: "pointer", background: "transparent", border: "1px solid rgba(255,255,255,0.07)", color: "#9ca3af" };
-const primaryBtn = { padding: "6px 14px", borderRadius: 7, fontSize: "0.8rem", fontFamily: "'DM Sans', sans-serif", cursor: "pointer", background: "#00e5c3", border: "none", color: "#0a0b0f", fontWeight: 600 };
+const primaryBtn = { padding: "6px 14px", borderRadius: 7, fontSize: "0.8rem", fontFamily: "'DM Sans', sans-serif", cursor: "pointer", background: "#2563eb", border: "none", color: "#0a0b0f", fontWeight: 600 };
