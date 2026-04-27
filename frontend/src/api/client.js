@@ -1,5 +1,4 @@
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
-
+const BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 async function request(path, options = {}) {
   const res = await fetch(`${BASE_URL}${path}`, {
     headers: { "Content-Type": "application/json", ...options.headers },
@@ -19,13 +18,14 @@ async function request(path, options = {}) {
 export async function runAudit(formData) {
   const res = await fetch(`${BASE_URL}/api/audit/upload`, {
     method: "POST",
-    body: formData, // multipart — no Content-Type header, browser sets it
+    body: formData,
   });
   if (!res.ok) throw new Error(`Upload failed: ${res.status}`);
-  const { audit_id } = await res.json();
-
-  // Poll until analysis is complete
-  return pollAudit(audit_id);
+  
+  // Backend returns full result directly — no polling needed
+  const data = await res.json();
+  console.log("✅ Raw API response:", data);
+  return data;
 }
 
 /**
@@ -110,24 +110,37 @@ export async function applyFix({ auditId, fix }) {
  * @param {"euai" | "gdpr"} type
  */
 export function getExportUrl(auditId, type = "euai") {
-  return `${BASE_URL}/api/export/${auditId}?type=${type}`;
+return `${BASE_URL}/api/audit/${auditId}/export?type=${type}`;
 }
 
 /**
  * Trigger PDF generation and download it.
  */
 export async function exportPDF(auditId, type = "euai") {
-  const res = await fetch(getExportUrl(auditId, type));
-  if (!res.ok) throw new Error("Export failed");
-  const blob = await res.blob();
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement("a");
-  a.href     = url;
-  a.download = `equalitylens-audit-${auditId}-${type}.pdf`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
+  if (!auditId || auditId === "undefined" || auditId === "unknown") {
+    throw new Error("Invalid audit ID: " + auditId);
+  }
 
+  const url = `${BASE_URL}/api/audit/${auditId}/export?type=${type}`;
+  console.log("📄 Exporting PDF:", url);
+
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Export failed: ${res.status}`);
+
+  const arrayBuffer = await res.arrayBuffer();
+  if (arrayBuffer.byteLength === 0) throw new Error("PDF is empty");
+
+  const blob    = new Blob([arrayBuffer], { type: "application/pdf" });
+  const blobUrl = URL.createObjectURL(blob);
+  const a       = document.createElement("a");
+  a.href        = blobUrl;
+  a.download    = `equalitylens-${auditId}.pdf`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(blobUrl);
+  console.log("✅ PDF downloaded");
+}
 // ── HELPERS ────────────────────────────────────────────
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }

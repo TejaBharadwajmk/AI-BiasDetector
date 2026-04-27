@@ -4,6 +4,7 @@ import DivergenceScore from "../components/DivergenceScore";
 import TradeoffExplorer from "../components/TradeoffExplorer";
 import ClaudeExplainer from "../components/ClaudeExplainer";
 import { runAudit, runLLMProbe } from "../api/client";
+import { exportPDF } from "../api/client";
 
 const SAMPLES = [
   { key: "adult",   label: "UCI Adult Income",  rows: "48,842 rows", attrs: "gender, race, age",    color: "#ff5f7e" },
@@ -19,7 +20,7 @@ const LOADING_STEPS = [
   "Building intersectional bias matrix",
   "Cross-validating with community reports",
   "Computing divergence score",
-  "Generating Claude AI explanation",
+  "Generating Gemini AI explanation",
 ];
 
 const STEP_DELAYS = [600, 1000, 1400, 1000, 800, 600, 1200];
@@ -65,45 +66,106 @@ export default function EngineerPortal() {
     fileObjRef.current = null;
   }
 
-  async function animateLoading(callback) {
+  async function animateLoading() {
     setLoading(true);
     setLoadingStep(0);
     setDoneSteps([]);
-
     for (let i = 0; i < LOADING_STEPS.length; i++) {
       await new Promise(r => setTimeout(r, STEP_DELAYS[i]));
       setDoneSteps(prev => [...prev, i]);
       if (i + 1 < LOADING_STEPS.length) setLoadingStep(i + 1);
     }
-
     await new Promise(r => setTimeout(r, 400));
     setLoading(false);
     setLoadingStep(-1);
     setDoneSteps([]);
-    callback();
   }
 
   async function startAudit(type) {
-    animateLoading(async () => {
-      try {
-        let data;
-        if (type === "csv") {
-          const formData = new FormData();
-          if (fileObjRef.current) formData.append("file", fileObjRef.current);
-          formData.append("sample", selectedSample?.key || "adult");
-          formData.append("target_col", targetCol || "income");
-          formData.append("protected_attrs", protectedAttrs.join(","));
-          data = await runAudit(formData);
-        } else {
-          data = await runLLMProbe({ endpoint: llmEndpoint, apiKey: llmKey, domain: llmDomain, attrs: protectedAttrs });
+    console.log("🚀 startAudit called, type:", type);
+    console.log("📁 file:", fileObjRef.current);
+    console.log("📊 sample:", selectedSample);
+    console.log("🎯 targetCol:", targetCol);
+    console.log("🔒 protectedAttrs:", protectedAttrs);
+
+    if (!fileObjRef.current && !selectedSample) {
+      alert("Please upload a file or select a sample dataset first.");
+      return;
+    }
+
+    // Run animation and API call in parallel
+    const animationPromise = animateLoading();
+
+    let data;
+    try {
+      if (type === "csv") {
+        const formData = new FormData();
+        if (fileObjRef.current) {
+          formData.append("file", fileObjRef.current);
+          console.log("📎 Appended file:", fileObjRef.current.name);
         }
-        setAuditData(data);
-      } catch {
-        // Use mock data if backend not ready yet
-        setAuditData(getMockData());
+        formData.append("sample", selectedSample?.key || "adult");
+        formData.append("target_col", targetCol || "income");
+        formData.append("protected_attrs", protectedAttrs.join(","));
+
+        console.log("📡 Sending request to backend...");
+        data = await runAudit(formData);
+        console.log("✅ API response:", data);
+      } else {
+        data = await runLLMProbe({
+          endpoint: llmEndpoint,
+          apiKey: llmKey,
+          domain: llmDomain,
+          attrs: protectedAttrs,
+        });
       }
-      setView("dashboard");
-    });
+    } catch (err) {
+    console.error("❌ API error:", err.message);
+    alert(`Audit failed: ${err.message}`);
+    return;
+    }
+
+    // Wait for animation to finish before showing dashboard
+    await animationPromise;
+
+   const transformedData = {
+  // Identity — fixes "unknown" audit ID
+  id:      data.audit_id || data.id,
+  auditId: data.audit_id || data.id,
+
+  // Dataset info — fixes "undefined" chips
+  file:  data.file || data.dataset_name || fileObjRef.current?.name || "Dataset",
+  rows:  data.rows || selectedSample?.rows || "N/A",
+  attrs: data.attrs ||
+         (Array.isArray(data.protected_attributes)
+           ? data.protected_attributes.join(", ")
+           : data.protected_attributes) || "N/A",
+
+  // Score cards — fixes 0.00 overall bias
+  overallBias:      Number(data.overall_bias ?? 0),
+  divergenceIndex:  Number(data.divergence?.index ?? data.divergence_index ?? 0),
+  proxyCount:       Number(data.proxy_count ?? data.proxy_vars?.length ?? 0),
+  communityReports: Number(data.community_reports ?? 0),
+
+  // Panels — fixes empty proxy scanner
+  proxyVars:         data.proxy_vars         || data.proxy_variables        || [],
+  metrics:           data.metrics            || data.bias_scores            || [],
+  heatmap:           data.heatmap            || data.intersectional_matrix  || [],
+  divergence:        data.divergence         || null,
+  claudeExplanation: data.claude_explanation || "",
+  impactStatement:  data.impact_statement  || "",
+  complianceScore:  data.compliance_score  || 0,
+  complianceStatus: data.compliance_status || "Review Required",
+  complianceColor:  data.compliance_color  || "#f5a623",
+ };
+
+console.log("✅ transformedData:", transformedData);
+setAuditData(transformedData);
+setView("dashboard");
+
+setAuditData(transformedData);
+    setView("dashboard");
+    console.log("✅ Dashboard opened with data:", data);
   }
 
   function getMockData() {
@@ -192,8 +254,17 @@ export default function EngineerPortal() {
             <span style={{ color: "#e8eaf0", fontWeight: 500 }}>{view === "upload" ? "New Audit" : "Audit Results"}</span>
           </div>
           <div style={{ display: "flex", gap: 12 }}>
-            <button onClick={() => window.location.href = "/"} style={ghostBtn}>← Home</button>
-            <button disabled={!auditData} style={auditData ? primaryBtn : { ...primaryBtn, opacity: 0.4, cursor: "not-allowed" }}>Export PDF ↓</button>
+            <button onClick={() => {
+  const id = auditData?.id || auditData?.auditId;
+  console.log("Exporting with ID:", id);
+  if (!id || id === "undefined") {
+    alert("No audit ID — please run an audit first");
+    return;
+  }
+  exportPDF(id);
+}}>
+  Export PDF ↓
+</button>
           </div>
         </div>
 
@@ -308,8 +379,8 @@ export default function EngineerPortal() {
 
           {/* ── DASHBOARD VIEW ── */}
           {view === "dashboard" && auditData && (
-            <Dashboard data={auditData} />
-          )}
+  <Dashboard data={auditData} />
+)}
         </div>
       </div>
 
@@ -357,7 +428,7 @@ function Dashboard({ data }) {
         {/* PROXY SCANNER */}
         <Panel title="🔍 Proxy Variable Scanner" tag="4 Found" tagColor="#ff5f7e">
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {data.proxyVars.map(p => (
+            {data.proxyVars?.map(p => (
               <div key={p.col} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: p.level === "danger" ? "rgba(255,95,126,0.04)" : "rgba(245,166,35,0.04)", border: `1px solid ${p.level === "danger" ? "rgba(255,95,126,0.2)" : "rgba(245,166,35,0.2)"}`, borderRadius: 8 }}>
                 <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "0.78rem", width: 100, flexShrink: 0 }}>{p.col}</span>
                 <span style={{ color: "#6b7280", fontSize: "0.72rem" }}>→</span>
@@ -374,7 +445,7 @@ function Dashboard({ data }) {
         {/* BIAS METRICS */}
         <Panel title="📐 Fairness Metrics">
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            {data.metrics.map(m => (
+            {data.metrics?.map(m => (
               <div key={m.name}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
                   <span style={{ fontSize: "0.82rem", fontWeight: 500 }}>{m.name}</span>
@@ -391,13 +462,19 @@ function Dashboard({ data }) {
 
         {/* HEATMAP */}
         <div style={{ gridColumn: "span 2" }}>
-          <BiasHeatmap data={data.heatmap} />
+          <BiasHeatmap data={data.heatmap || []} />
         </div>
 
-        {/* DIVERGENCE */}
-        <div style={{ gridColumn: "span 2" }}>
-          <DivergenceScore data={data.divergence} />
-        </div>
+       {/* DIVERGENCE */}
+<div style={{ gridColumn: "span 2" }}>
+  {data.divergence ? (
+    <DivergenceScore data={data.divergence} />
+  ) : (
+    <div style={{ color: "#6b7280", fontSize: "0.8rem" }}>
+      No divergence data available
+    </div>
+  )}
+</div>
 
         {/* CLAUDE */}
         <div style={{ gridColumn: "span 2" }}>

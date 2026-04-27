@@ -67,7 +67,7 @@ const NAV_SECTIONS = [
   {
     label: "Action",
     items: [
-      { id: "claude",    icon: "🤖", label: "Claude AI"         },
+      { id: "claude",    icon: "🤖", label: "Gemini AI"         },
       { id: "tradeoff",  icon: "⚖", label: "Tradeoff Explorer" },
     ],
   },
@@ -207,6 +207,52 @@ export default function Dashboard({ auditId, initialData }) {
             </div>
           </div>
 
+          {auditData.impactStatement && (
+  <div style={{
+    padding: "14px 20px",
+    background: "rgba(255,95,126,0.06)",
+    border: "1px solid rgba(255,95,126,0.2)",
+    borderRadius: 12,
+    fontSize: "0.95rem",
+    fontWeight: 500,
+    color: "#ff5f7e",
+    textAlign: "center",
+    marginBottom: 20,
+    fontStyle: "italic",
+  }}>
+    💬 "{auditData.impactStatement}"
+  </div>
+)}
+
+{auditData.complianceScore > 0 && (
+  <div style={{
+    textAlign: "center",
+    padding: "20px",
+    background: "#10121a",
+    border: `2px solid ${auditData.complianceColor}`,
+    borderRadius: 16,
+    marginBottom: 20,
+  }}>
+    <div style={{
+      fontFamily: "'Syne',sans-serif",
+      fontSize: "3rem",
+      fontWeight: 800,
+      color: auditData.complianceColor,
+      lineHeight: 1,
+    }}>
+      {auditData.complianceScore}%
+    </div>
+    <div style={{ color: "#6b7280", fontSize: "0.78rem", marginTop: 4 }}>
+      EU AI ACT COMPLIANCE SCORE
+    </div>
+    <div style={{ color: auditData.complianceColor, fontSize: "0.8rem", fontWeight: 600, marginTop: 6 }}>
+      {auditData.complianceScore >= 80 ? "✓ Likely Compliant"
+       : auditData.complianceScore >= 55 ? "⚠ Review Required"
+       : "✗ Non-Compliant"}
+    </div>
+  </div>
+)}
+
           {/* ── SCORE CARDS ── */}
           <div id="scores" ref={el => panelRefs.current["scores"] = el}
             style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14 }}>
@@ -223,7 +269,7 @@ export default function Dashboard({ auditId, initialData }) {
             <Panel id="proxy" ref={el => panelRefs.current["proxy"] = el}
               title="🔍 Proxy Variable Scanner" tag="4 Found" tagColor="#ff5f7e">
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                {data.proxyVars.map(p => (
+                {data.proxyVars || [].map(p => (
                   <div key={p.col} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: p.level === "danger" ? "rgba(255,95,126,0.04)" : "rgba(245,166,35,0.04)", border: `1px solid ${p.level === "danger" ? "rgba(255,95,126,0.18)" : "rgba(245,166,35,0.18)"}`, borderRadius: 8 }}>
                     <span style={{ fontFamily: "'DM Mono',monospace", fontSize: "0.76rem", width: 96, flexShrink: 0 }}>{p.col}</span>
                     <span style={{ color: "#4b5563", fontSize: "0.7rem" }}>→</span>

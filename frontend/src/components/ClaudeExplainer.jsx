@@ -18,7 +18,7 @@ export default function ClaudeExplainer({ explanation }) {
   return (
     <div style={{ background: "linear-gradient(135deg, #10121a, rgba(0,229,195,0.03))", border: "1px solid rgba(0,229,195,0.12)", borderRadius: 14, overflow: "hidden" }}>
       <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", gap: 10 }}>
-        <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>🤖 Claude AI Explanation</span>
+        <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>🤖 Gemini AI Explanation</span>
         <span style={{ padding: "2px 8px", borderRadius: 100, fontFamily: "'DM Mono', monospace", fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "0.06em", background: "rgba(0,229,195,0.1)", color: "#00e5c3" }}>Plain English</span>
       </div>
 
