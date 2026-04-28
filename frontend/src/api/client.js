@@ -32,11 +32,21 @@ export async function runAudit(formData) {
  * Run LLM bias probe against an external API endpoint.
  */
 export async function runLLMProbe({ endpoint, apiKey, domain, attrs }) {
-  const { audit_id } = await request("/api/audit/llm-probe", {
+  const res = await fetch(`${BASE_URL}/api/audit/llm-probe`, {
     method: "POST",
-    body: JSON.stringify({ endpoint, api_key: apiKey, domain, protected_attrs: attrs }),
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      endpoint,
+      api_key: apiKey,
+      domain,
+      protected_attrs: attrs,
+    }),
   });
-  return pollAudit(audit_id);
+  if (!res.ok) throw new Error(`LLM Probe failed: ${res.status}`);
+  
+  const data = await res.json();
+  console.log("✅ LLM Probe result:", data);
+  return data;
 }
 
 /**
