@@ -128,44 +128,54 @@ export default function EngineerPortal() {
     // Wait for animation to finish before showing dashboard
     await animationPromise;
 
-   const transformedData = {
-  // Identity — fixes "unknown" audit ID
-  id:      data.audit_id || data.id,
-  auditId: data.audit_id || data.id,
-
-  // Dataset info — fixes "undefined" chips
-  file:  data.file || data.dataset_name || fileObjRef.current?.name || "Dataset",
-  rows:  data.rows || selectedSample?.rows || "N/A",
-  attrs: data.attrs ||
-         (Array.isArray(data.protected_attributes)
-           ? data.protected_attributes.join(", ")
-           : data.protected_attributes) || "N/A",
-
-  // Score cards — fixes 0.00 overall bias
-  overallBias:      Number(data.overall_bias ?? 0),
-  divergenceIndex:  Number(data.divergence?.index ?? data.divergence_index ?? 0),
-  proxyCount:       Number(data.proxy_count ?? data.proxy_vars?.length ?? 0),
-  communityReports: Number(data.community_reports ?? 0),
-
-  // Panels — fixes empty proxy scanner
-  proxyVars:         data.proxy_vars         || data.proxy_variables        || [],
-  metrics:           data.metrics            || data.bias_scores            || [],
-  heatmap:           data.heatmap            || data.intersectional_matrix  || [],
-  divergence:        data.divergence         || null,
-  claudeExplanation: data.claude_explanation || "",
-  impactStatement:  data.impact_statement  || "",
-  complianceScore:  data.compliance_score  || 0,
-  complianceStatus: data.compliance_status || "Review Required",
-  complianceColor:  data.compliance_color  || "#f5a623",
- };
+  const transformedData = type === "llm" ? {
+      id:               data.audit_id || data.id || "llm-probe",
+      auditId:          data.audit_id || data.id || "llm-probe",
+      file:             `LLM Probe — ${data.domain || "hiring"}`,
+      rows:             `${data.probes_run || 0} prompts sent`,
+      attrs:            protectedAttrs.join(", "),
+      overallBias:      Number(Math.abs(data.metrics?.approval_rate_gap || 0)),
+      divergenceIndex:  0,
+      proxyCount:       0,
+      communityReports: 0,
+      proxyVars:        [],
+      metrics:          [
+        { name: "Approval Rate Gap", score: Number(Math.abs(data.metrics?.approval_rate_gap || 0)), color: "#ff5f7e", desc: "Gap between majority and minority approval rates" },
+        { name: "Group A Approval",  score: Number(data.metrics?.approval_rate_group_a || 0),       color: "#00e5c3", desc: "Majority name approval rate" },
+        { name: "Group B Approval",  score: Number(data.metrics?.approval_rate_group_b || 0),       color: "#f5a623", desc: "Minority name approval rate" },
+      ],
+      heatmap:           [],
+      divergence:        null,
+      claudeExplanation: data.interpretation || "LLM bias probe complete.",
+      impactStatement:   `LLM shows ${data.severity} bias — ${Math.round(Math.abs(data.metrics?.approval_rate_gap || 0) * 100)}pp gap detected.`,
+      complianceScore:   data.severity === "HIGH" ? 35 : 60,
+      complianceStatus:  data.severity === "HIGH" ? "Non-Compliant" : "Review Required",
+      complianceColor:   data.severity === "HIGH" ? "#ff5f7e" : "#f5a623",
+    } : {
+      id:               data.audit_id || data.id,
+      auditId:          data.audit_id || data.id,
+      file:             data.file || data.dataset_name || fileObjRef.current?.name || "Dataset",
+      rows:             data.rows || selectedSample?.rows || "N/A",
+      attrs:            data.attrs || (Array.isArray(data.protected_attributes) ? data.protected_attributes.join(", ") : data.protected_attributes) || "N/A",
+      overallBias:      Number(data.overall_bias ?? 0),
+      divergenceIndex:  Number(data.divergence?.index ?? data.divergence_index ?? 0),
+      proxyCount:       Number(data.proxy_count ?? data.proxy_vars?.length ?? 0),
+      communityReports: Number(data.community_reports ?? 0),
+      proxyVars:        data.proxy_vars        || data.proxy_variables       || [],
+      metrics:          data.metrics           || data.bias_scores           || [],
+      heatmap:          data.heatmap           || data.intersectional_matrix || [],
+      divergence:       data.divergence        || null,
+      claudeExplanation:data.claude_explanation || "",
+      impactStatement:  data.impact_statement  || "",
+      complianceScore:  data.compliance_score  || 0,
+      complianceStatus: data.compliance_status || "Review Required",
+      complianceColor:  data.compliance_color  || "#f5a623",
+    };
 
 console.log("✅ transformedData:", transformedData);
 setAuditData(transformedData);
 setView("dashboard");
 
-setAuditData(transformedData);
-    setView("dashboard");
-    console.log("✅ Dashboard opened with data:", data);
   }
 
   function getMockData() {
